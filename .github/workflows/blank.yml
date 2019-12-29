@@ -22,9 +22,15 @@ jobs:
           echo $GITHUB_REF
       -
         name: tag test cinditional
-        if: startsWith(steps.vars.outputs.tag, 'v')
+        if: startsWith(GITHUB_REF:5, 'tag')
         run: |
-          echo ${{ steps.vars.outputs.tag }}
+          echo "tag" && ${{ steps.vars.outputs.tag }}
+          
+      -
+        name: tag test cinditional
+        if: startsWith(GITHUB_REF:5, 'head')
+        run: |
+          echo "head" && echo ${{ steps.vars.outputs.tag }}
       -
         name: Setup Node.js for use with actions
         uses: actions/setup-node@v1.1.0
