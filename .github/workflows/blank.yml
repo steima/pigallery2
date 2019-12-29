@@ -3,7 +3,7 @@ on:
   pull_request:
     branches: master
   push:
-    branches: master
+    branches: tag-dockerx-worflow
 
 jobs:
   create-release:
@@ -22,57 +22,32 @@ jobs:
         run: npm install --unsafe-perm
       -
         name: Create Release
-        run: npm run create-release -- --skip-opt-packages=ffmpeg,ffprobe --force-opt-packages
+        run: npm run create-release -- --skip-opt-packages=ffmpeg,ffprobe --lagnuages=en
       - uses: actions/upload-artifact@v1
         with:
           name: pigallery2-release
           path: release
-  build-alpine:
-    runs-on: [ubuntu-latest]
-    needs: [create-release]
-    steps:
-      -
-        name: Checkout
-        uses: actions/checkout@v1
-      -
-        uses: actions/download-artifact@v1
-        with:
-          name: pigallery2-release
-      -
-        name: Set up Docker Buildx
-        id: buildx
-        uses: crazy-max/ghaction-docker-buildx@v1
-        with:
-          version: latest
-      -
-        name: Available platforms
-        run: echo ${{ steps.buildx.outputs.platforms }}
-      -
-        name: Docker login
-        run: |
-          docker login -u "${DOCKER_REGISTRY_USERNAME}" -p "${DOCKER_REGISTRY_PASSWORD}"
-        env:
-          DOCKER_REGISTRY_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
-          DOCKER_REGISTRY_PASSWORD: ${{ secrets.REGISTRY_PASSWORD }}
-      -
-        name: Run Buildx alpine
-        run: |
-          docker buildx build \
-            --platform linux/amd64,linux/arm64,linux/386,linux/arm/v6,linux/arm/v7 \
-            --output "type=image,push=true" \
-            --tag bpatrik/pigallery2:nightly-alpine \
-            --file docker/alpine/Dockerfile.build  .
-      -
-        name: Docker logout
-        run: |
-          docker logout
+
   build-stretch:
     runs-on: [ubuntu-latest]
     needs: [create-release]
     steps:
       -
         name: Checkout
-        uses: actions/checkout@v1
+        uses: actions/checkout@v1        
+      - 
+        name: Set output
+        id: vars
+        run: echo ::set-output name=tag::$(echo ${GITHUB_REF:10})      
+      -
+        name: tag test
+        run: |
+          echo ${{ steps.vars.outputs.tag }}
+      -
+        name: tag test cinditional
+        if: contains(${{ steps.vars.outputs.tag }}, 'v')
+        run: |
+          echo ${{ steps.vars.outputs.tag }}
       -
         uses: actions/download-artifact@v1
         with:
@@ -97,10 +72,15 @@ jobs:
         name: Run Buildx stretch
         run: |
           docker buildx build \
-            --platform linux/amd64,linux/arm64,linux/arm/v7 \
+            --platform linux/amd64 \
             --output "type=image,push=true" \
             --tag bpatrik/pigallery2:nightly-stretch \
             --file docker/debian-stretch/Dockerfile.build  .
+      -
+        name: Run add latest tag
+        run: |
+          docker tag bpatrik/pigallery2:nightly-stretch bpatrik/pigallery:latest && \
+          docker push bpatrik/pigallery:latest      
       -
         name: Docker logout
         run: |
