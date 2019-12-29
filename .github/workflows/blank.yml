@@ -22,7 +22,7 @@ jobs:
           echo $GITHUB_REF
       -
         name: tag test cinditional
-        if: steps.vars.outputs.tag
+        if: startsWith(steps.vars.outputs.tag, 'v')
         run: |
           echo ${{ steps.vars.outputs.tag }}
       -
@@ -35,7 +35,7 @@ jobs:
         run: npm install --unsafe-perm
       -
         name: Create Release
-        run: npm run create-release -- --skip-opt-packages=ffmpeg,ffprobe --lagnuages=en
+        run: npm run create-release -- --skip-opt-packages=ffmpeg,ffprobe --languages=en
       - uses: actions/upload-artifact@v1
         with:
           name: pigallery2-release
