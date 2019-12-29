@@ -12,6 +12,19 @@ jobs:
       -
         name: Checkout
         uses: actions/checkout@v1
+      - 
+        name: Set output
+        id: vars
+        run: echo ::set-output name=tag::$(echo ${GITHUB_REF:10})      
+      -
+        name: tag test
+        run: |
+          echo ${{ steps.vars.outputs.tag }}
+      -
+        name: tag test cinditional
+        if: steps.vars.outputs.tag
+        run: |
+          echo ${{ steps.vars.outputs.tag }}
       -
         name: Setup Node.js for use with actions
         uses: actions/setup-node@v1.1.0
