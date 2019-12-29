@@ -88,12 +88,8 @@ jobs:
             --platform linux/amd64 \
             --output "type=image,push=true" \
             --tag bpatrik/pigallery2:nightly-stretch \
+            --tag bpatrik/pigallery:latest \
             --file docker/debian-stretch/Dockerfile.build  .
-      -
-        name: Run add latest tag
-        run: |
-          docker tag bpatrik/pigallery2:nightly-stretch bpatrik/pigallery:latest && \
-          docker push bpatrik/pigallery:latest      
       -
         name: Docker logout
         run: |
