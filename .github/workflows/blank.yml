@@ -18,9 +18,8 @@ jobs:
         run: echo ::set-output name=tag::$(echo ${GITHUB_REF:10})      
       -
         name: tag test
-        run: |
-          echo ${{ steps.vars.outputs.tag }} && \ 
-          echo ${GITHUB_REF:10}
+        run: | 
+          echo $GITHUB_REF
       -
         name: tag test cinditional
         if: steps.vars.outputs.tag
