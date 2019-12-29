@@ -45,7 +45,7 @@ jobs:
           echo ${{ steps.vars.outputs.tag }}
       -
         name: tag test cinditional
-        if: $(echo ${GITHUB_REF:10})  
+        if: steps.vars.outputs.tag
         run: |
           echo ${{ steps.vars.outputs.tag }}
       -
