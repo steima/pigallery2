@@ -15,20 +15,20 @@ jobs:
       - 
         name: Set output
         id: vars
-        run: echo ::set-output name=tag::$(echo ${GITHUB_REF:10})      
+        run: echo ::set-output name=tag::$(echo ${GITHUB_REF:10}) &&   echo ::set-output name=type::$(echo ${GITHUB_REF:5})   
       -
         name: tag test
         run: | 
           echo $GITHUB_REF
       -
         name: tag test cinditional
-        if: startsWith(GITHUB_REF:5, 'tag')
+        if: startsWith(steps.vars.outputs.type , 'tag')
         run: |
           echo "tag" && ${{ steps.vars.outputs.tag }}
           
       -
         name: tag test cinditional
-        if: startsWith(GITHUB_REF:5, 'head')
+        if: startsWith(steps.vars.outputs.type, 'head')
         run: |
           echo "head" && echo ${{ steps.vars.outputs.tag }}
       -
